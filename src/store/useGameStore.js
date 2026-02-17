@@ -15,12 +15,15 @@ export const useGameStore = create((set, get) => ({
     mySeatIndex: 0, // Set by SeatSelectionModal
 
     players: [
-        // Mock 4 players for UI development
-        { seatIndex: 0, name: 'You', avatar: '🃏', balance: 1000, cardCount: 13, status: 'active' },
-        { seatIndex: 1, name: 'Alice', avatar: '👩', balance: 850, cardCount: 10, status: 'active' },
-        { seatIndex: 2, name: 'Bob', avatar: '👨', balance: 1200, cardCount: 8, status: 'active' },
-        { seatIndex: 3, name: 'Charlie', avatar: '🧑', balance: 950, cardCount: 5, status: 'pass' },
+        // Mock 4 players for UI development — each has latency for ping indicator
+        { seatIndex: 0, name: 'You', avatar: '🃏', balance: 1000, cardCount: 13, status: 'active', latency: 32 },
+        { seatIndex: 1, name: 'Alice', avatar: '👩', balance: 850, cardCount: 10, status: 'active', latency: 78 },
+        { seatIndex: 2, name: 'Bob', avatar: '👨', balance: 1200, cardCount: 8, status: 'active', latency: 156 },
+        { seatIndex: 3, name: 'Charlie', avatar: '🧑', balance: 950, cardCount: 5, status: 'pass', latency: 340 },
     ],
+
+    // Scoresheet — Round History
+    roundHistory: generateMockRoundHistory(),
 
     // Game State (Dynamic)
     turnSeatIndex: 0,
@@ -160,6 +163,39 @@ export const useGameStore = create((set, get) => ({
     setConnected: (val) => set({ isConnected: val }),
     setLatency: (ms) => set({ latency: ms }),
     setMatchStatus: (status) => set({ matchStatus: status }),
+
+    // --- Ping / Latency ---
+    simulateLatencies: () => {
+        const { players } = get()
+        set({
+            players: players.map((p) => ({
+                ...p,
+                latency: Math.max(10, Math.floor(p.latency + (Math.random() - 0.5) * 80)),
+            })),
+        })
+    },
+
+    // --- Scoresheet ---
+    addRoundResult: (result) => {
+        const { roundHistory } = get()
+        set({ roundHistory: [...roundHistory, result] })
+    },
+
+    getLiveStandings: () => {
+        const { roundHistory, players } = get()
+        // Accumulate net scores per player
+        const totals = {}
+        players.forEach((p) => { totals[p.name] = { name: p.name, avatar: p.avatar, seatIndex: p.seatIndex, total: 0, wins: 0 } })
+        roundHistory.forEach((round) => {
+            round.scores.forEach((s) => {
+                if (totals[s.name]) {
+                    totals[s.name].total += s.netScore
+                    if (s.isWinner) totals[s.name].wins += 1
+                }
+            })
+        })
+        return Object.values(totals).sort((a, b) => b.total - a.total)
+    },
 }))
 
 /** Skip over locked-out players to find next active seat. */
@@ -173,7 +209,7 @@ function getNextActiveSeat(state, startSeat) {
     return startSeat
 }
 
-// --- Mock Data Generator ---
+// --- Mock Data Generators ---
 function generateMockHand() {
     const suits = [0, 1, 2, 3] // 0=Diamond, 1=Club, 2=Heart, 3=Spade
     const hand = []
@@ -199,4 +235,24 @@ function generateMockHand() {
         [hand[i], hand[j]] = [hand[j], hand[i]]
     }
     return hand
+}
+
+function generateMockRoundHistory() {
+    const names = ['You', 'Alice', 'Bob', 'Charlie']
+    const rounds = []
+    for (let r = 1; r <= 5; r++) {
+        const winnerIdx = (r - 1) % 4
+        const scores = names.map((name, i) => {
+            const isWinner = i === winnerIdx
+            const cardCount = isWinner ? 0 : Math.floor(Math.random() * 10) + 3
+            const multiplier = cardCount >= 13 ? 4 : cardCount >= 10 ? 2 : 1
+            const penalty = isWinner ? 0 : cardCount * 25 * multiplier
+            return { name, cardCount, multiplier, netScore: isWinner ? 0 : -penalty, isWinner, isCulprit: false, label: null }
+        })
+        // Winner gets sum of all penalties
+        const totalPenalties = scores.reduce((s, p) => s + (p.isWinner ? 0 : Math.abs(p.netScore)), 0)
+        scores[winnerIdx].netScore = totalPenalties
+        rounds.push({ round: r, scores })
+    }
+    return rounds
 }

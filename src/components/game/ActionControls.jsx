@@ -48,7 +48,7 @@ export default function ActionControls() {
     }
 
     return (
-        <div className="flex flex-col items-center gap-3 w-full max-w-md mx-auto">
+        <div className="flex flex-col items-center gap-2 sm:gap-3 w-full max-w-md mx-auto px-2 sm:px-0">
             {/* Timer bar */}
             {isMyTurn && !isLockedOut && (
                 <div className="w-full">
@@ -59,10 +59,10 @@ export default function ActionControls() {
                         />
                     </div>
                     <div className="flex justify-between mt-1">
-                        <span className={`text-[10px] ${needs3D && !has3DInSelection ? 'text-amber-400 font-semibold' : 'text-text-muted'}`}>
+                        <span className={`text-[9px] sm:text-[10px] ${needs3D && !has3DInSelection ? 'text-amber-400 font-semibold' : 'text-text-muted'}`}>
                             {statusLabel}
                         </span>
-                        <span className={`text-[10px] font-bold ${turnTimer <= 5 ? 'text-ember-500' : 'text-text-muted'}`}>
+                        <span className={`text-[9px] sm:text-[10px] font-bold ${turnTimer <= 5 ? 'text-ember-500' : 'text-text-muted'}`}>
                             {turnTimer}s
                         </span>
                     </div>
@@ -73,16 +73,16 @@ export default function ActionControls() {
             {needs3D && (
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
                     <Diamond size={12} className="text-red-400" />
-                    <span className="text-[10px] text-amber-300 font-medium">
+                    <span className="text-[9px] sm:text-[10px] text-amber-300 font-medium">
                         First turn — must include 3♦ in your play
                     </span>
                 </div>
             )}
 
             {/* Action buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
                 {isLockedOut ? (
-                    <div className="text-amber-400 text-sm font-medium px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <div className="text-amber-400 text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
                         🔒 Passed — Locked until new lead
                     </div>
                 ) : isMyTurn ? (
@@ -122,7 +122,7 @@ export default function ActionControls() {
                         </Button>
                     </>
                 ) : (
-                    <div className="text-text-muted text-sm italic px-4 py-2">
+                    <div className="text-text-muted text-xs sm:text-sm italic px-3 sm:px-4 py-2">
                         Waiting for other player&apos;s turn…
                     </div>
                 )}
@@ -130,3 +130,4 @@ export default function ActionControls() {
         </div>
     )
 }
+

@@ -28,23 +28,23 @@ function TableCard({ table, role, onSit, onWatch, onPlay, onDelete, onExtend, on
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ scale: 1.01 }}
-            className="glass-panel p-5 bg-surface-800/60 hover:bg-surface-700/60 transition-colors group"
+            className="glass-panel p-3 sm:p-5 bg-surface-800/60 hover:bg-surface-700/60 transition-colors group"
         >
             <div className="flex items-start justify-between mb-3">
                 <div>
-                    <h3 className="font-bold text-text-primary flex items-center gap-2">
+                    <h3 className="font-bold text-sm sm:text-base text-text-primary flex items-center gap-2">
                         {table.name}
                         {table.name.includes('VIP') && <Crown size={14} className="text-gold-400" />}
                     </h3>
-                    <p className="text-text-muted text-xs mt-0.5">Agent: {table.agent}</p>
+                    <p className="text-text-muted text-[10px] sm:text-xs mt-0.5">Agent: {table.agent}</p>
                 </div>
                 <Badge status={table.status} />
             </div>
 
-            <div className="flex items-center gap-4 mb-2 text-text-secondary text-xs">
-                <span className="flex items-center gap-1"><Users size={13} />{table.players}/{table.maxPlayers}</span>
-                {isPlaying && <span className="flex items-center gap-1"><Clock size={13} />Round {table.round}/{table.totalRounds}</span>}
-                <span className="flex items-center gap-1"><Zap size={13} />{table.baseScore} pts</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2 text-text-secondary text-[10px] sm:text-xs">
+                <span className="flex items-center gap-1"><Users size={12} />{table.players}/{table.maxPlayers}</span>
+                {isPlaying && <span className="flex items-center gap-1"><Clock size={12} />Round {table.round}/{table.totalRounds}</span>}
+                <span className="flex items-center gap-1"><Zap size={12} />{table.baseScore} pts</span>
             </div>
 
             {/* Seated players (for agent kick control) */}
@@ -173,45 +173,45 @@ export default function LobbyPage() {
     const handleLogout = () => { logout(); navigate('/login') }
 
     return (
-        <div className="min-h-screen p-4 md:p-8">
+        <div className="min-h-[100dvh] p-3 sm:p-4 md:p-8">
             <ToastContainer />
 
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between mb-8"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-6 sm:mb-8"
             >
                 <div>
-                    <h1 className="text-2xl font-bold text-gradient-gold">Big Two Club</h1>
-                    <p className="text-text-secondary text-sm">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gradient-gold">Big Two Club</h1>
+                    <p className="text-text-secondary text-xs sm:text-sm">
                         Welcome back, <span className="text-text-primary font-medium">{user?.username}</span>
                         <Badge status={role === 'agent' ? 'active' : role === 'operator' ? 'watching' : 'playing'} className="ml-2" />
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     {role === 'agent' && (
-                        <Button variant="gold" onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
-                            <Plus size={16} /> Create Table
+                        <Button variant="gold" onClick={() => setShowCreateModal(true)} className="flex items-center gap-1.5 sm:gap-2 text-sm">
+                            <Plus size={15} /> Create Table
                         </Button>
                     )}
-                    <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-2">
-                        <LogOut size={16} /> Logout
+                    <Button variant="ghost" onClick={handleLogout} className="flex items-center gap-1.5 sm:gap-2 text-sm">
+                        <LogOut size={15} /> Logout
                     </Button>
                 </div>
             </motion.header>
 
             <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
-                className="glass-panel p-4 mb-6 bg-surface-800/40 border-emerald-500/20"
+                className="glass-panel p-3 sm:p-4 mb-4 sm:mb-6 bg-surface-800/40 border-emerald-500/20"
             >
-                <p className="text-sm text-text-secondary">
+                <p className="text-xs sm:text-sm text-text-secondary">
                     {role === 'agent' && '🎯 Agent View — Create tables, play or watch games, kick players, delete empty tables.'}
                     {role === 'operator' && '🔭 Operator View — Watch games and extend rounds. Cannot create tables or sit at seats.'}
                     {role === 'player' && '🃏 Player View — Sit at available tables or watch games in progress.'}
                 </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {visibleTables.map((table, i) => (
                     <motion.div key={table.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}>
                         <TableCard
@@ -229,10 +229,10 @@ export default function LobbyPage() {
             </div>
 
             {visibleTables.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-text-muted">
-                    <Users size={48} className="mb-4 opacity-30" />
-                    <p className="text-lg">No tables available</p>
-                    <p className="text-sm">{role === 'agent' ? 'Create your first table to get started' : 'Your agent hasn\'t created any tables yet'}</p>
+                <div className="flex flex-col items-center justify-center py-12 sm:py-20 text-text-muted">
+                    <Users size={40} className="mb-4 opacity-30" />
+                    <p className="text-base sm:text-lg">No tables available</p>
+                    <p className="text-xs sm:text-sm">{role === 'agent' ? 'Create your first table to get started' : 'Your agent hasn\'t created any tables yet'}</p>
                 </div>
             )}
 
